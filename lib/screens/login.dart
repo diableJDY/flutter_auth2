@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_auth2/data/join_or_login.dart';
 import 'package:firebase_auth2/helper/login_background.dart';
+import 'package:firebase_auth2/screens/forget_pw.dart';
 import 'package:firebase_auth2/screens/main_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -104,13 +105,25 @@ class AuthPage extends StatelessWidget {
                   Consumer<JoinOrLogin>(
                     builder: (context, joinOrLogin, child) => Opacity(
                         opacity: joinOrLogin.isJoin ? 0 : 1,
-                        child: Text("Forgot Password")),
+                        child: GestureDetector(
+                          onTap: joinOrLogin.isJoin
+                              ? null
+                              : () {
+                                  goToForgetPw(context);
+                                },
+                          child: Text('Forget Password'),
+                        )),
                   ),
                 ],
               )),
         ),
       ),
     );
+  }
+
+  goToForgetPw(BuildContext context) {
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => ForgetPw()));
   }
 
   Widget _authButton(Size size) => Positioned(
@@ -130,7 +143,7 @@ class AuthPage extends StatelessWidget {
                   borderRadius: BorderRadius.circular(25)),
               onPressed: () {
                 if (_formKey.currentState.validate()) {
-                  joinOrLogin.isJoin?_register(context): _login(context);
+                  joinOrLogin.isJoin ? _register(context) : _login(context);
                 }
               },
             ),
@@ -138,32 +151,38 @@ class AuthPage extends StatelessWidget {
         ),
       );
 
-  void _login(BuildContext context) async{
-    final UserCredential result = await FirebaseAuth.instance.signInWithEmailAndPassword(email: _emailController.text, password: _passwordController.text);
-    final User  user = result.user;
+  void _login(BuildContext context) async {
+    final UserCredential result = await FirebaseAuth.instance
+        .signInWithEmailAndPassword(
+            email: _emailController.text, password: _passwordController.text);
+    final User user = result.user;
 
-    if(user == null){
-      final snackbar = SnackBar(content: Text('아이디,비번이 틀렸당'),);
+    if (user == null) {
+      final snackbar = SnackBar(
+        content: Text('아이디,비번이 틀렸당'),
+      );
       Scaffold.of(context).showSnackBar(snackbar);
     }
 
     //Navigator.push(context, MaterialPageRoute(builder: (context)=> MainPage(email: user.email,)));
-
   }
 
-  void _register(BuildContext context) async{
-    final UserCredential result = await FirebaseAuth.instance.createUserWithEmailAndPassword(email: _emailController.text, password: _passwordController.text);
-    final FirebaseUser  user = result.user;
+  void _register(BuildContext context) async {
+    final UserCredential result = await FirebaseAuth.instance
+        .createUserWithEmailAndPassword(
+            email: _emailController.text, password: _passwordController.text);
+    final User user = result.user;
 
-    if(user == null){
-      final snackbar = SnackBar(content: Text('아이디,비번이 틀렸당'),);
+    if (user == null) {
+      final snackbar = SnackBar(
+        content: Text('아이디,비번이 틀렸당'),
+      );
       Scaffold.of(context).showSnackBar(snackbar);
     }
 
     //Navigator.push(context, MaterialPageRoute(builder: (context)=> MainPage(email: user.email,)));
-
   }
-  
+
   Widget get _logoImage => Expanded(
         child: Padding(
           padding: const EdgeInsets.only(top: 40, left: 24, right: 24),
